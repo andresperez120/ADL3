@@ -104,8 +104,50 @@ class BaseLLM:
                 for r in self.batched_generate(prompts[idx : idx + micro_batch_size], num_return_sequences, temperature)
             ]
 
-        raise NotImplementedError()
+        #set the padding to the left side
+        self.tokenizer.padding_side = "left"
 
+        #then, tokenize the input prompts with padding. 
+        inputs = self.tokenizer(
+            prompts,
+            padding=True,
+            return_tensors="pt",
+        ).to(self.device)
+
+        #set the generation parameters
+        gen_args = {
+            "max_new_tokens": 50,
+            "do_sample": temperature > 0,
+            "temperature": temperature,
+            "num_return_sequences": num_return_sequences or 1,
+            "eos_token_id": self.tokenizer.eos_token_id,
+        }
+        
+        #generate the outputs
+        outputs = self.model.generate(
+            input_ids=inputs["input_ids"],
+            attention_mask=inputs["attention_mask"],
+            **gen_args,
+        )
+
+        #get rid of the input tokens from the outputs
+        gen_only = outputs[:, inputs["input_ids"].shape[1] :]
+
+        #decode the outputs
+        decoded = self.tokenizer.batch_decode(gen_only, skip_special_tokens=True)
+
+        #reshape the output based on the number of return sequences
+        if num_return_sequences is None or num_return_sequences == 1:
+            return decoded
+        else:
+            return [
+                decoded[i * num_return_sequences : (i + 1) * num_return_sequences]
+                for i in range(len(prompts))
+            ]
+        
+
+
+    
     def answer(self, *questions) -> list[float]:
         """
         Answer questions given as individual string arguments.
