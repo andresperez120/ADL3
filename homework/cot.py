@@ -11,7 +11,7 @@ class CoTModel(BaseLLM):
         messages = [
             {"role": "system", "content": "You are a helpful assistant that performs unit conversions. Be concise. Think step by step. Always use <answer>NUMBER</answer> format."},
             {"role": "user", "content": "How many grams are in 2 kilograms?"},
-            {"role": "assistant", "content": "First, 1 kilogram is equal to 1000 grams. Therefore, 2 kilograms is equal to 2 times 1000 which is equal to <answer>2000</answer>"},
+            {"role": "assistant", "content": "First, 1 kilogram = 1000 grams. Therefore, 2 kilograms = 2 × 1000 = <answer>2000</answer>"},
             {"role": "user", "content": question}
         ]
         
