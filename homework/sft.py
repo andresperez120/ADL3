@@ -116,10 +116,12 @@ def train_model(
         per_device_train_batch_size=32,
         gradient_checkpointing=True,
         logging_dir=output_dir,
-        learning_rate=5e-5,
+        learning_rate=1e-4,
+        warmup_steps=100,
         save_steps=500,
-        eval_steps=100,  
-        save_total_limit=1, 
+        eval_steps=100,
+        save_total_limit=1,
+        weight_decay=0.01
     )
 
     #load tokenized dataset
