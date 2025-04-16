@@ -117,11 +117,15 @@ class BaseLLM:
         #set the generation parameters
         gen_args = {
             "max_new_tokens": 50,
-            "do_sample": temperature > 0,
-            "temperature": temperature,
             "num_return_sequences": num_return_sequences or 1,
             "eos_token_id": self.tokenizer.eos_token_id,
         }
+
+        if temperature > 0:
+            gen_args["do_sample"] = True
+            gen_args["temperature"] = temperature
+        else:
+            gen_args["do_sample"] = False
         
         #generate the outputs
         outputs = self.model.generate(
