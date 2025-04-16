@@ -80,28 +80,31 @@ class TokenizedDataset:
 
 
 def train_model(
-    output_dir: str,
+    output_dir: str = "homework/sft_model",
     **kwargs,
 ):
+    from pathlib import Path
     from peft import LoraConfig, get_peft_model
     from transformers import TrainingArguments, Trainer
+    
+    # Create output directory if it doesn't exist
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
     
     #load the model
     llm = BaseLLM()
 
     #convert the model to LoRA model
     lora_config = LoraConfig(
-        target_modules = 'all_linear',
-        bias = 'none',
-        task_type = 'CAUSAL_LM',
-        r = 8,
-        lora_alpha = 4,
+        target_modules="all-linear",  
+        bias="none",
+        task_type="CAUSAL_LM",
+        r=8,
+        lora_alpha=32,  # Set to 4x the rank as recommended in README
     )
 
     #load the Lora model
     model = get_peft_model(llm.model, lora_config)
     model.train()
-
 
     #enable input require grads
     model.enable_input_require_grads()
