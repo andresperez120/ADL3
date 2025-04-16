@@ -9,9 +9,11 @@ class CoTModel(BaseLLM):
         """
 
         messages = [
-            {"role": "system", "content": "You are a converison calculator. Be concise. Show your work."},
+            {"role": "system", "content": "You are a helpful assistant that performs unit conversions. Always follow these steps:\n1. Identify the units\n2. Use the conversion rate\n3. Multiply or divide appropriately\n4. Put your final answer in <answer>NUMBER</answer> format.\nBe concise and show your work."},
             {"role": "user", "content": "How many meters are in 5 kilometers?"},
-            {"role": "assistant", "content": "1 kilometer = 1000 meters. 5 * 1000 = <answer>5000</answer>"},
+            {"role": "assistant", "content": "1 km = 1000 m\n5 km * 1000 = <answer>5000</answer>"},
+            {"role": "user", "content": "How many grams are in 3 kilograms?"},
+            {"role": "assistant", "content": "1 kg = 1000 g\n3 kg * 1000 = <answer>3000</answer>"},
             {"role": "user", "content": question}
         ]
         
