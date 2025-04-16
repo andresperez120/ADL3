@@ -112,19 +112,17 @@ def train_model(
     #define the training args
     training_args = TrainingArguments(
         output_dir=output_dir,
-        num_train_epochs=3,  
-        per_device_train_batch_size=16,  
-        gradient_accumulation_steps=2,  
+        num_train_epochs=3,
+        per_device_train_batch_size=16,
+        gradient_accumulation_steps=2,
         gradient_checkpointing=True,
         logging_dir=output_dir,
-        learning_rate=2e-4,  
-        warmup_ratio=0.1, 
-        save_strategy="epoch",
-        evaluation_strategy="epoch",
-        load_best_model_at_end=True,
+        learning_rate=2e-4,
+        warmup_ratio=0.1,
+        save_steps=500,
         save_total_limit=1,
         weight_decay=0.01,
-        fp16=True  
+        fp16=True
     )
 
     #load tokenized dataset

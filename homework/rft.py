@@ -49,22 +49,22 @@ def train_model(
     from transformers import TrainingArguments, Trainer
     from .base_llm import BaseLLM
 
-    # Create output directory if it doesn't exist
+    # Create output directory
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     
-    # Load RFT dataset
+    #load rft data
     with open("data/rft.json", "r") as f:
         rft_data = json.load(f)
     
     llm = BaseLLM()
     
-    # Double the LoRA size compared to SFT
+    # double the lora size compared to sft
     lora_config = LoraConfig(
         target_modules="all-linear",
         bias="none",
         task_type="CAUSAL_LM",
-        r=8,  # Double the SFT rank (which is now 4)
-        lora_alpha=32  # Maintain the same r:alpha ratio
+        r=8,
+        lora_alpha=32  
     )
     
     model = get_peft_model(llm.model, lora_config)
@@ -93,7 +93,7 @@ def train_model(
         train_dataset=train_dataset,
     )
     
-    # Train and save
+    
     trainer.train()
     trainer.save_model(output_dir)
 
