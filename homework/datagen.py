@@ -39,20 +39,25 @@ def generate_dataset(output_json: str, oversample: int = 10, temperature: float 
             if isinstance(completions, list) and isinstance(completions[0], list):
                 completions = completions[0]
             
-            # Check each completion for correct answer
+            # Check each completion for correct answer using 5% tolerance
             found_valid = False
+            true_answer_float = float(true_answer)
+            tolerance = 0.05 * abs(true_answer_float)  # 5% tolerance
+            
             for completion in completions:
                 try:
                     parsed_answer = model.parse_answer(completion)
-                    if abs(parsed_answer - float(true_answer)) < 1e-6:
-                        dataset.append([
-                            question,
-                            float(true_answer),
-                            completion.strip()
-                        ])
-                        total_correct += 1
-                        found_valid = True
-                        break
+                    if abs(parsed_answer - true_answer_float) <= tolerance:
+                        # Only keep completions that show reasoning and have the answer tag
+                        if "<answer>" in completion and "</answer>" in completion:
+                            dataset.append([
+                                question,
+                                true_answer_float,
+                                completion.strip()
+                            ])
+                            total_correct += 1
+                            found_valid = True
+                            break
                 except (ValueError, IndexError):
                     continue
             
@@ -60,6 +65,7 @@ def generate_dataset(output_json: str, oversample: int = 10, temperature: float 
             if total_processed % 10 == 0:
                 success_rate = (total_correct / total_processed) * 100
                 print(f"Processed {total_processed}/{len(trainset)} questions. Success rate: {success_rate:.1f}%")
+                print(f"Dataset size so far: {len(dataset)}")
             
             if not found_valid:
                 print(f"\nWarning: No valid completion found for question: {question}")

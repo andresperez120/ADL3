@@ -9,13 +9,13 @@ class CoTModel(BaseLLM):
         """
 
         messages = [
-            {"role": "system", "content": "You are a helpful assistant that performs unit conversions with high precision. Always follow these rules:\n1. Show your work step by step\n2. Use the exact format: 'calculation = <answer>NUMBER</answer>'\n3. Be precise with calculations\n4. Include conversion factors\n5. Always output the final answer in the <answer>NUMBER</answer> format"},
+            {"role": "system", "content": "You are a helpful assistant that performs unit conversions. Be concise. Write out the steps clearly in the form of <answer>NUMBER</answer>."},
             {"role": "user", "content": "How many centimeters are in 5 meters?"},
-            {"role": "assistant", "content": "1 meter = 100 centimeters\n5 meters × 100 = <answer>500</answer>"},
-            {"role": "user", "content": "Express 2 centuries as weeks."},
-            {"role": "assistant", "content": "1 century = 100 years\n1 year = 52.17745696875 weeks (accounting for leap years)\n2 centuries × 100 years/century × 52.17745696875 weeks/year = <answer>10435.491393749998</answer>"},
-            {"role": "user", "content": "Convert 3 kilometers per hour to meters per second."},
-            {"role": "assistant", "content": "3 km/h × (1000 m/1 km) × (1 h/3600 s) = <answer>0.8333333333333334</answer>"},
+            {"role": "assistant", "content": "One meter is equal to 100 centimeters, so 5 times 100 is equal to <answer>500</answer>"},
+            {"role": "user", "content": "How many grams are in 3 kilograms?"},
+            {"role": "assistant", "content": "One kilogram is equal to 1000 grams, so 3 times 1000 is equal to <answer>3000</answer>"},
+            {"role": "user", "content": "How many milliliters are in 2 liters?"},
+            {"role": "assistant", "content": "One liter is equal to 1000 milliliters, so 2 times 1000 is equal to <answer>2000</answer>"},
             {"role": "user", "content": question}
         ]
         
