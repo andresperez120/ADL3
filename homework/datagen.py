@@ -21,11 +21,17 @@ def generate_dataset(output_json: str, oversample: int = 10, temperature: float 
         print(f"\nQuestion {i+1}: {question}")
         print(f"True answer: {true_answer}")
         
+        # Show the formatted prompt
+        prompt = model.format_prompt(question)
+        print("\nFormatted prompt:")
+        print(prompt)
+        
         # Generate multiple completions with temperature
         completions = model.batched_generate(
             [question],
             num_return_sequences=oversample,
-            temperature=temperature
+            temperature=temperature,
+            max_new_tokens=100  # Increase max tokens to ensure full completion
         )
         
         # Handle both possible return types from batched_generate
@@ -35,7 +41,9 @@ def generate_dataset(output_json: str, oversample: int = 10, temperature: float 
         print("\nModel outputs:")
         for j, completion in enumerate(completions):
             print(f"\nCompletion {j+1}:")
+            print("---")
             print(completion)
+            print("---")
             try:
                 parsed = model.parse_answer(completion)
                 print(f"Parsed answer: {parsed}")
