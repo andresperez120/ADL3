@@ -21,17 +21,16 @@ def generate_dataset(output_json: str, oversample: int = 10, temperature: float 
         print(f"\nQuestion {i+1}: {question}")
         print(f"True answer: {true_answer}")
         
-        # Show the formatted prompt
+        # Get the formatted prompt with chat template
         prompt = model.format_prompt(question)
         print("\nFormatted prompt:")
         print(prompt)
         
         # Generate multiple completions with temperature
         completions = model.batched_generate(
-            [question],
+            [prompt],  # Use the formatted prompt instead of just the question
             num_return_sequences=oversample,
-            temperature=temperature,
-            max_new_tokens=100  # Increase max tokens to ensure full completion
+            temperature=temperature
         )
         
         # Handle both possible return types from batched_generate

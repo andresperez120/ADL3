@@ -115,7 +115,7 @@ class BaseLLM:
 
         #set the generation parameters
         gen_args = {
-            "max_new_tokens": 50,
+            "max_new_tokens": 100,
             "num_return_sequences": num_return_sequences or 1,
             "eos_token_id": self.tokenizer.eos_token_id,
         }
