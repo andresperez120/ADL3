@@ -91,11 +91,9 @@ class BaseLLM:
         Pro Tip: Only batch_decode generated tokens by masking out the inputs with
                  outputs[:, len(inputs["input_ids"][0]) :]
         """
-        from tqdm import tqdm  # Importing tqdm for progress bar
+        from tqdm import tqdm
 
-        # Preventing OOM
-        # Depending on your GPU batched generation will use a lot of memory.
-        # If you run out of memory, try to reduce the micro_batch_size.
+        #handle micro-batching to prevent OOM
         micro_batch_size = 32
         if len(prompts) > micro_batch_size:
             return [
@@ -113,14 +111,18 @@ class BaseLLM:
         inputs = self.tokenizer(
             prompts,
             padding=True,
+            truncation=True,
             return_tensors="pt",
+            return_attention_mask=True,
         ).to(self.device)
 
         #set the generation parameters
         gen_args = {
-            "max_new_tokens": 100,
+            "max_new_tokens": 50, 
             "num_return_sequences": num_return_sequences or 1,
             "eos_token_id": self.tokenizer.eos_token_id,
+            "pad_token_id": self.tokenizer.pad_token_id,
+            "attention_mask": inputs["attention_mask"],
         }
 
         if temperature > 0:
@@ -132,15 +134,17 @@ class BaseLLM:
         #generate the outputs
         outputs = self.model.generate(
             input_ids=inputs["input_ids"],
-            attention_mask=inputs["attention_mask"],
             **gen_args,
         )
 
-        #get rid of the input tokens from the outputs
-        gen_only = outputs[:, inputs["input_ids"].shape[1] :]
-
-        #decode the outputs
-        decoded = self.tokenizer.batch_decode(gen_only, skip_special_tokens=True)
+        #get input length for proper slicing
+        input_length = inputs["input_ids"].shape[1]
+        
+        #only decode the newly generated tokens
+        decoded = self.tokenizer.batch_decode(
+            outputs[:, input_length:],
+            skip_special_tokens=True
+        )
 
         #reshape the output based on the number of return sequences
         if num_return_sequences is None or num_return_sequences == 1:
@@ -150,10 +154,7 @@ class BaseLLM:
                 decoded[i * num_return_sequences : (i + 1) * num_return_sequences]
                 for i in range(len(prompts))
             ]
-        
 
-
-    
     def answer(self, *questions) -> list[float]:
         """
         Answer questions given as individual string arguments.

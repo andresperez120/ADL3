@@ -19,7 +19,7 @@ class CoTModel(BaseLLM):
             {"role": "user", "content": question}
         ]
         
-        # Create a simple template since the model doesn't have a chat template
+        #make template since the model doesn't have a chat template
         prompt = ""
         for msg in messages:
             if msg["role"] == "system":

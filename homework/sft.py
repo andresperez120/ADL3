@@ -49,11 +49,10 @@ def format_example(prompt: str, answer: str) -> dict[str, str]:
     """
     Construct a question / answer pair. Consider rounding the answer to make it easier for the LLM.
     """
-    #round the answer then format it
-    rounded_answer = round(float(answer), 2)
-    #format the question and answer
+    # Format answer with exactly 2 decimal places
+    rounded_answer = f"{float(answer):.2f}"
+    # Format as a simple completion task
     formatted_answer = f"<answer>{rounded_answer}</answer>"
-
     return {"question": prompt, "answer": formatted_answer}
 
 
@@ -87,19 +86,20 @@ def train_model(
     from peft import LoraConfig, get_peft_model
     from transformers import TrainingArguments, Trainer
     
-    # Create output directory if it doesn't exist
+    # Create output directory
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     
-    #load the model
+    #load model
     llm = BaseLLM()
 
     #convert the model to LoRA model
     lora_config = LoraConfig(
-        target_modules="all-linear",  
+        target_modules="all-linear",
         bias="none",
         task_type="CAUSAL_LM",
-        r=4,
-        lora_alpha=16,
+        r=16,  
+        lora_alpha=64,  
+        lora_dropout=0.1 
     )
 
     #load the Lora model
@@ -112,16 +112,19 @@ def train_model(
     #define the training args
     training_args = TrainingArguments(
         output_dir=output_dir,
-        num_train_epochs=5,
-        per_device_train_batch_size=32,
+        num_train_epochs=3,  
+        per_device_train_batch_size=16,  
+        gradient_accumulation_steps=2,  
         gradient_checkpointing=True,
         logging_dir=output_dir,
-        learning_rate=1e-4,
-        warmup_steps=100,
-        save_steps=500,
-        eval_steps=100,
+        learning_rate=2e-4,  
+        warmup_ratio=0.1, 
+        save_strategy="epoch",
+        evaluation_strategy="epoch",
+        load_best_model_at_end=True,
         save_total_limit=1,
-        weight_decay=0.01
+        weight_decay=0.01,
+        fp16=True  
     )
 
     #load tokenized dataset
@@ -132,9 +135,9 @@ def train_model(
 
     #define the trainer
     trainer = Trainer(
-        model = model,
-        args = training_args,
-        train_dataset = train_dataset,
+        model=model,
+        args=training_args,
+        train_dataset=train_dataset,
     )
 
     #train

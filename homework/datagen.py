@@ -13,7 +13,7 @@ def generate_dataset(output_json: str, oversample: int = 10, temperature: float 
     print(f"Starting dataset generation with oversample={oversample}, temperature={temperature}")
     print(f"Processing {len(trainset)} questions from training set")
 
-    # Process questions in batches of 10 for efficiency
+    #proccess the questions in batches of 10 for efficiency
     batch_size = 10
     total_correct = 0
     total_processed = 0
@@ -25,24 +25,24 @@ def generate_dataset(output_json: str, oversample: int = 10, temperature: float 
         for question, true_answer in batch:
             total_processed += 1
             
-            # Get the formatted prompt with chat template
+            #get the formatted prompt with chat template
             prompt = model.format_prompt(question)
             
-            # Generate multiple completions with temperature
+            #generate multiple completions with temperature
             completions = model.batched_generate(
                 [prompt],
                 num_return_sequences=oversample,
                 temperature=temperature
             )
             
-            # Handle both possible return types from batched_generate
+            #handle both possible return types from batched_generate
             if isinstance(completions, list) and isinstance(completions[0], list):
                 completions = completions[0]
             
-            # Check each completion for correct answer using 5% tolerance
+            #checck each completion for correct answer using 5% tolerance
             found_valid = False
             true_answer_float = float(true_answer)
-            tolerance = 0.05 * abs(true_answer_float)  # 5% tolerance
+            tolerance = 0.05 * abs(true_answer_float)
             
             for completion in completions:
                 try:
@@ -61,7 +61,7 @@ def generate_dataset(output_json: str, oversample: int = 10, temperature: float 
                 except (ValueError, IndexError):
                     continue
             
-            # Print progress
+            #show the progress
             if total_processed % 10 == 0:
                 success_rate = (total_correct / total_processed) * 100
                 print(f"Processed {total_processed}/{len(trainset)} questions. Success rate: {success_rate:.1f}%")
@@ -78,10 +78,10 @@ def generate_dataset(output_json: str, oversample: int = 10, temperature: float 
         print("ERROR: No valid examples were generated!")
         return
     
-    # Create output directory if needed
+    #make the output directory if needed
     Path(output_json).parent.mkdir(parents=True, exist_ok=True)
     
-    # Save the dataset
+    #save
     with open(output_json, 'w') as f:
         json.dump(dataset, f, indent=2)
     
