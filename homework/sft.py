@@ -99,7 +99,7 @@ def train_model(
         bias="none",
         task_type="CAUSAL_LM",
         r=8,
-        lora_alpha=32,  # Set to 4x the rank as recommended in README
+        lora_alpha=32, 
     )
 
     #load the Lora model
@@ -111,14 +111,15 @@ def train_model(
 
     #define the training args
     training_args = TrainingArguments(
-        output_dir = output_dir,
-        evaluation_strategy = 'steps',
-        num_train_epochs = 3,
-        per_device_train_batch_size = 16,
-        gradient_checkpointing = True,
-        logging_dir = output_dir,
-        learning_rate = 5e-5,
-        save_steps = 500,
+        output_dir=output_dir,
+        num_train_epochs=5,
+        per_device_train_batch_size=32,
+        gradient_checkpointing=True,
+        logging_dir=output_dir,
+        learning_rate=5e-5,
+        save_steps=500,
+        eval_steps=100,  
+        save_total_limit=1, 
     )
 
     #load tokenized dataset
