@@ -12,6 +12,9 @@ class BaseLLM:
         self.tokenizer = AutoTokenizer.from_pretrained(checkpoint)
         self.model = AutoModelForCausalLM.from_pretrained(checkpoint).to(device)
         self.device = device
+        
+        # Set up padding token for the tokenizer
+        self.tokenizer.pad_token = self.tokenizer.eos_token
 
     def format_prompt(self, question: str) -> str:
         """
