@@ -49,7 +49,12 @@ def format_example(prompt: str, answer: str) -> dict[str, str]:
     """
     Construct a question / answer pair. Consider rounding the answer to make it easier for the LLM.
     """
-    raise NotImplementedError()
+    #round the answer then format it
+    rounded_answer = round(float(answer), 2)
+    #format the question and answer
+    formatted_answer = f"<answer>{rounded_answer}</answer>"
+
+    return {"question": prompt, "answer": formatted_answer}
 
 
 class TokenizedDataset:
@@ -78,10 +83,60 @@ def train_model(
     output_dir: str,
     **kwargs,
 ):
-    raise NotImplementedError()
-    test_model(output_dir)
+    from peft import LoraConfig, get_peft_model
+    from transformers import TrainingArguments, Trainer
+    
+    #load the model
+    llm = BaseLLM()
+
+    #convert the model to LoRA model
+    lora_config = LoraConfig(
+        target_modules = 'all_linear',
+        bias = 'none',
+        task_type = 'CAUSAL_LM',
+        r = 8,
+        lora_alpha = 4,
+    )
+
+    #load the Lora model
+    model = get_peft_model(llm.model, lora_config)
+    model.train()
 
 
+    #enable input require grads
+    model.enable_input_require_grads()
+
+    #define the training args
+    training_args = TrainingArguments(
+        output_dir = output_dir,
+        evaluation_strategy = 'steps',
+        num_train_epochs = 3,
+        per_device_train_batch_size = 16,
+        gradient_checkpointing = True,
+        logging_dir = output_dir,
+        learning_rate = 5e-5,
+        save_steps = 500,
+    )
+
+    #load tokenized dataset
+    from .data import Dataset
+
+    trainset = Dataset("train")
+    train_dataset = TokenizedDataset(llm.tokenizer, trainset, format_example)
+
+    #define the trainer
+    trainer = Trainer(
+        model = model,
+        args = training_args,
+        train_dataset = train_dataset,
+    )
+
+    #train
+    trainer.train()
+    #save
+    trainer.save_model(output_dir)
+
+    
 def test_model(ckpt_path: str):
     testset = Dataset("valid")
     llm = BaseLLM()
