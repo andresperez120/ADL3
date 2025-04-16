@@ -17,6 +17,28 @@ def load() -> BaseLLM:
     return llm
 
 
+def format_rft_example(question: str, completion: str) -> dict[str, str]:
+    """
+    Format the RFT example. Instead of formatting a numeric answer,
+    we use the full completion that includes reasoning.
+    """
+    return {"question": question, "answer": completion}
+
+
+class RFTDataset:
+    def __init__(self, tokenizer, data):
+        self.tokenizer = tokenizer
+        self.data = data
+    
+    def __len__(self):
+        return len(self.data)
+    
+    def __getitem__(self, idx):
+        question, _, completion = self.data[idx]
+        from .sft import tokenize  # Import the tokenize function from sft.py
+        return tokenize(self.tokenizer, **format_rft_example(question, completion))
+
+
 def train_model(
     output_dir: str,
     **kwargs,
@@ -25,23 +47,23 @@ def train_model(
     from pathlib import Path
     from peft import LoraConfig, get_peft_model
     from transformers import TrainingArguments, Trainer
-    from .sft import TokenizedDataset, format_example
     from .base_llm import BaseLLM
 
     # Create output directory if it doesn't exist
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     
-    #load RFT dataset
+    # Load RFT dataset
     with open("data/rft.json", "r") as f:
         rft_data = json.load(f)
     
     llm = BaseLLM()
     
+    # Double the LoRA size compared to SFT
     lora_config = LoraConfig(
         target_modules="all-linear",
         bias="none",
         task_type="CAUSAL_LM",
-        r=16,  # Doubled from SFT for better performance
+        r=16,  # Doubled from SFT
         lora_alpha=64  # 4x the rank as recommended
     )
     
@@ -62,20 +84,6 @@ def train_model(
         save_total_limit=1,
         weight_decay=0.01
     )
-    
-    #create dataset class for RFT data
-    class RFTDataset(TokenizedDataset):
-        def __init__(self, tokenizer, data):
-            self.tokenizer = tokenizer
-            self.data = data
-        
-        def __len__(self):
-            return len(self.data)
-        
-        def __getitem__(self, idx):
-            question, _, completion = self.data[idx]
-            #use the completion (which includes reasoning) as the target
-            return format_example(question, completion)
     
     train_dataset = RFTDataset(llm.tokenizer, rft_data)
     
