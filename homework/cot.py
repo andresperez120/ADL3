@@ -19,11 +19,17 @@ class CoTModel(BaseLLM):
             {"role": "user", "content": question}
         ]
         
-        return self.tokenizer.apply_chat_template(
-            messages,
-            add_generation_prompt=True,
-            tokenize=False
-        )
+        # Create a simple template since the model doesn't have a chat template
+        prompt = ""
+        for msg in messages:
+            if msg["role"] == "system":
+                prompt += f"Instructions: {msg['content']}\n\n"
+            elif msg["role"] == "user":
+                prompt += f"Question: {msg['content']}\n"
+            elif msg["role"] == "assistant":
+                prompt += f"Answer: {msg['content']}\n\n"
+        
+        return prompt
 
 
 def load() -> CoTModel:
