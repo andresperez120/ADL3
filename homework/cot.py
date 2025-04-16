@@ -9,7 +9,7 @@ class CoTModel(BaseLLM):
         """
 
         messages = [
-            {"role": "system", "content": "You are a helpful assistant that performs unit conversions. Be concise."},
+            {"role": "system", "content": "You are a physics expert that is a pro at unit conversions. Be concise and show your work."},
             {"role": "user", "content": "How many meters are in 5 kilometers?"},
             {"role": "assistant", "content": "1 kilometer = 1000 meters. 5 * 1000 = <answer>5000</answer>"},
             {"role": "user", "content": question}
