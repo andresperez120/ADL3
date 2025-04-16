@@ -9,9 +9,9 @@ class CoTModel(BaseLLM):
         """
 
         messages = [
-            {"role": "system", "content": "You are a helpful assistant that performs unit conversions. Be concise. Think step by step. Always use <answer>NUMBER</answer> format."},
-            {"role": "user", "content": "How many grams are in 2 kilograms?"},
-            {"role": "assistant", "content": "First, 1 kilogram = 1000 grams. Therefore, 2 kilograms = 2 × 1000 = <answer>2000</answer>"},
+            {"role": "system", "content": "You are a helpful assistant that performs unit conversions. Be concise. Write out the steps clearly in the form of <answer>NUMBER</answer>."},
+            {"role": "user", "content": "How many centimeters are in 5 meters?"},
+            {"role": "assistant", "content": "One meter is equal to 100 centimeters, so 5 times 100 is equal to <answer>500</answer>"},
             {"role": "user", "content": question}
         ]
         
