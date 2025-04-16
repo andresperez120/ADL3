@@ -1,9 +1,8 @@
 from typing import overload
-import os
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-checkpoint = os.path.join(os.path.dirname(__file__), "models/SmolLM2-360M")
+checkpoint = "HuggingFaceTB/SmolLM2-360M"
 device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
 
