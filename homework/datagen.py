@@ -18,6 +18,9 @@ def generate_dataset(output_json: str, oversample: int = 10, temperature: float 
             temperature=temperature
         )
         
+        if not isinstance(completions, list):
+            completions = [completions]
+        
         # Check each completion for correct answer
         for completion in completions:
             try:
@@ -34,7 +37,7 @@ def generate_dataset(output_json: str, oversample: int = 10, temperature: float 
             except (ValueError, IndexError):
                 continue  # Skip bad outputs
     
-    
+    # Create output directory if needed
     Path(output_json).parent.mkdir(parents=True, exist_ok=True)
     
     #save the dataset with readme format
