@@ -63,8 +63,8 @@ def train_model(
         target_modules="all-linear",
         bias="none",
         task_type="CAUSAL_LM",
-        r=16,  # Doubled from SFT
-        lora_alpha=64  # 4x the rank as recommended
+        r=8,  # Double the SFT rank (which is now 4)
+        lora_alpha=32  # Maintain the same r:alpha ratio
     )
     
     model = get_peft_model(llm.model, lora_config)

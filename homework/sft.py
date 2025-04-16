@@ -98,8 +98,8 @@ def train_model(
         target_modules="all-linear",  
         bias="none",
         task_type="CAUSAL_LM",
-        r=8,
-        lora_alpha=32, 
+        r=4,
+        lora_alpha=16,
     )
 
     #load the Lora model
