@@ -9,9 +9,9 @@ class CoTModel(BaseLLM):
         """
 
         messages = [
-            {"role": "system", "content": "You are a helpful assistant that performs unit conversions. Be concise and show your work with <answer>NUMBER</answer>."},
-            {"role": "user", "content": "How many centimeters are in 5 meters?"},
-            {"role": "assistant", "content": "1 m is equal to 100 cm, so 5 times 100 is equal to <answer>500</answer>"},
+            {"role": "system", "content": "You are a helpful assistant that performs unit conversions. Be concise and write out the steps clearly with <answer>NUMBER</answer>."},
+            {"role": "user", "content": "How many meters are in 2 kilometers?"},
+            {"role": "assistant", "content": "One kilometer is equal to 1000 meters, so 2 times 1000 is equal to <answer>2000</answer>"},
             {"role": "user", "content": question}
         ]
         
