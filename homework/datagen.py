@@ -16,10 +16,7 @@ def generate_dataset(output_json: str, oversample: int = 10, temperature: float 
             [question],  # Needs to be a list for batched_generate
             num_return_sequences=oversample,
             temperature=temperature
-        )
-        
-        if not isinstance(completions, list):
-            completions = [completions]
+        )[0]  # Get the list of completions for this question
         
         # Check each completion for correct answer
         for completion in completions:
